@@ -156,7 +156,7 @@ $Tags = @{
 switch ($secretFormat) {
     "secret" {
         # Encode the certificate as a password-protrcted Base64 string
-        $pfxFilePath = $LEResult.PfxFile
+        $pfxFilePath = $LEResult.PfxFullChain
         $flag = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable 
         $collection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection 
         $collection.Import($pfxFilePath, $pfxpass, $flag) 
@@ -174,13 +174,13 @@ switch ($secretFormat) {
         # Upload cert to Key Vault
         Write-Host "Uploading certificate $certname to Key Vault"
         $certpw = $pfxpass | ConvertTo-SecureString -AsPlainText -Force
-        $KVsecret = Import-AzureKeyVaultCertificate -VaultName $keyVaultName -Name $certname -FilePath $LEResult.PfxFile -Password $certpw -Tag $Tags | Out-Null
+        $KVsecret = Import-AzureKeyVaultCertificate -VaultName $keyVaultName -Name $certname -FilePath $LEResult.PfxFullChain -Password $certpw -Tag $Tags | Out-Null
     }
     "key" {
         # Upload cert to Key Vault
         Write-Host "Uploading certificate $certname to Key Vault"
         $certpw = $pfxpass | ConvertTo-SecureString -AsPlainText -Force
-        $KVsecret = Add-AzureKeyVaultKey -VaultName $keyVaultName -Name $certname -KeyFilePath $LEResult.PfxFile -KeyFilePassword $certpw -Expires $LEResult.NotAfter -Tag $Tags | Out-Null
+        $KVsecret = Add-AzureKeyVaultKey -VaultName $keyVaultName -Name $certname -KeyFilePath $LEResult.PfxFullChain -KeyFilePassword $certpw -Expires $LEResult.NotAfter -Tag $Tags | Out-Null
     }
 }
 
